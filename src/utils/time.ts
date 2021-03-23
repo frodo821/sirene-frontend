@@ -3,12 +3,14 @@ function round2(num: number): number {
 }
 
 export function formatTime(time: number): string {
-  let sec = round2(time % 60)
+  const [secN, secF] = round2(time % 60)
+    .toString()
+    .split('.');
+  const min = Math.floor(time / 60)
     .toString()
     .padStart(2, '0');
-  let min = Math.floor(time / 60)
-    .toString()
-    .padStart(2, '0');
+
+  const sec = `${secN.padStart(2, '0')}.${secF.padEnd(2, '0')}`;
 
   return `${min}:${sec}`;
 }
