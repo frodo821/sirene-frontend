@@ -50,11 +50,82 @@
       >
     </Card>
   </div>
-  <Card style="padding: 0.5rem;margin: 1rem 0.5rem;">
-    {#if keyboard}
-      <SopranoKeyboard {onPointerDown} {onPointerUp} />
-    {:else}
-      <AltoKeyboard {onPointerDown} {onPointerUp} />
-    {/if}
+  <Card style="padding: 0.5rem;margin: 1rem 0.5rem">
+    <div class={`keyboard-container active-${keyboard ? 'soprano' : 'alto'}`}>
+      <div class="keyborad-soprano">
+        <SopranoKeyboard {onPointerDown} {onPointerUp} />
+      </div>
+      <div class="keyboard-alto">
+        <AltoKeyboard {onPointerDown} {onPointerUp} />
+      </div>
+    </div>
   </Card>
 </div>
+
+<style lang="scss">
+  @import '../styles/utils';
+  .keyboard-container {
+    position: relative;
+    transform-style: preserve-3d;
+    &.active-soprano {
+      background: none;
+
+      .keyborad-soprano {
+        opacity: 1;
+        @include desktop {
+          transform: rotateX(0deg);
+        }
+
+        @include mobile {
+          transform: rotateY(0deg);
+        }
+      }
+    }
+    &.active-alto {
+      background: none;
+      .keyboard-alto {
+        opacity: 1;
+        @include desktop {
+          transform: translateX(-50%) rotateX(0deg);
+        }
+
+        @include mobile {
+          transform: rotateY(0deg);
+        }
+      }
+    }
+
+    .keyborad-soprano {
+      transition: 500ms;
+      transform-origin: left top;
+      opacity: 0;
+
+      @include desktop {
+        transform: rotateX(90deg);
+      }
+
+      @include mobile {
+        transform: rotateY(90deg);
+      }
+    }
+
+    .keyboard-alto {
+      position: absolute;
+      transition: 500ms;
+      transform-origin: left top;
+      opacity: 0;
+
+      @include desktop {
+        left: 50%;
+        top: 0;
+        transform: translateX(-50%) rotateX(-90deg);
+      }
+
+      @include mobile {
+        left: 0;
+        top: 0;
+        transform: rotateY(-90deg);
+      }
+    }
+  }
+</style>
