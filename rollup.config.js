@@ -6,6 +6,9 @@ import { terser } from 'rollup-plugin-terser';
 import sveltePreprocess from 'svelte-preprocess';
 import typescript from '@rollup/plugin-typescript';
 import css from 'rollup-plugin-css-only';
+import replace from '@rollup/plugin-replace';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const production = !process.env.ROLLUP_WATCH;
 
@@ -67,6 +70,10 @@ export default {
       dedupe: ['svelte'],
     }),
     commonjs(),
+    replace({
+      values: { 'process.env.ENV': process.env.NODE_ENV || 'production' },
+      preventAssignment: true,
+    }),
     typescript({
       sourceMap: !production,
       inlineSources: !production,
