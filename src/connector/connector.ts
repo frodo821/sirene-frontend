@@ -16,6 +16,7 @@ export interface ServerStatus {
   playing: boolean;
   connectedPorts: ConnectedPort[];
   playingMusic: MusicPlayback | null;
+  loop_play: boolean;
 }
 
 export interface PlayMusicParams {
@@ -23,6 +24,7 @@ export interface PlayMusicParams {
   play_at?: number;
   play_device_ports?: string[];
   state: 'play' | 'paused';
+  loop_play?: boolean;
 }
 
 export interface SireneBackendConnector {

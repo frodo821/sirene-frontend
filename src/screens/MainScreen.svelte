@@ -8,9 +8,10 @@
     Card,
     CardTitle,
     CardText,
+    Switch,
   } from 'svelte-materialify';
   import { connector } from '../connector';
-  import { onDestroy } from 'svelte';
+  import { onDestroy, afterUpdate } from 'svelte';
   import type { ServerStatus } from '../connector/connector';
   import { formatTime } from '../utils/time';
 
@@ -18,19 +19,32 @@
   let status: ServerStatus;
   connector.get_status().then((it) => (status = it));
   let music_id: any;
+  let loop_play_checked: boolean;
 
-  const setState = async (id: number, state: 'play' | 'paused') => {
-    if (typeof id === 'undefined') {
-      return;
-    }
-    return connector.post_playing_music({ id, state });
+  const setState = async (
+    id: number | undefined,
+    state: 'play' | 'paused',
+    loop_play?: boolean
+  ) => {
+    return connector.post_playing_music({ id, state, loop_play });
   };
   const stop = async () => {
     return connector.stop_playing_music();
   };
 
   const refresher_id = setInterval(() => {
-    connector.get_status().then((it) => (status = it));
+    connector.get_status().then((it) => {
+      status = it;
+
+      console.log(loop_play_checked, status.loop_play);
+      if (loop_play_checked !== status.loop_play) {
+        setState(
+          status.playingMusic ? status.playingMusic.id : undefined,
+          status.playing ? 'play' : 'paused',
+          loop_play_checked
+        );
+      }
+    });
   }, 1000);
 
   onDestroy(() => clearInterval(refresher_id));
@@ -84,6 +98,7 @@
           on:click={() => stop()}
           disabled={!status.playing && !status.playingMusic}>中断</Button
         >
+        <Switch bind:checked={loop_play_checked}>ループ再生</Switch>
       </div>
     {/if}
     {#await music_request}
