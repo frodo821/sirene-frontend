@@ -71,7 +71,9 @@ export default {
     }),
     commonjs(),
     replace({
-      values: { 'process.env.ENV': process.env.NODE_ENV || 'production' },
+      values: {
+        'process.env.ENV': JSON.stringify(process.env.NODE_ENV || 'production'),
+      },
       preventAssignment: true,
     }),
     typescript({
