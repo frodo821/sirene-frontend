@@ -10,7 +10,7 @@ export function formatTime(time: number): string {
     .toString()
     .padStart(2, '0');
 
-  const sec = `${secN.padStart(2, '0')}.${secF.padEnd(2, '0')}`;
+  const sec = `${secN.padStart(2, '0')}.${(secF || '').padEnd(2, '0')}`;
 
   return `${min}:${sec}`;
 }
