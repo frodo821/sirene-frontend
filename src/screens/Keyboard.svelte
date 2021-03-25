@@ -38,6 +38,7 @@
 
   connector.get_status().then((it) => {
     items = it.connectedPorts.map(({ port: name }) => ({ name, value: name }));
+    value = items[0];
   });
 </script>
 
