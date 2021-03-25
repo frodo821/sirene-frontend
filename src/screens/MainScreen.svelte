@@ -45,7 +45,7 @@
         );
       }
     });
-  }, 1000);
+  }, 250);
 
   onDestroy(() => clearInterval(refresher_id));
 </script>
