@@ -8,7 +8,7 @@
     evt: PointerEvent & { currentTarget: HTMLDivElement }
   ) => {
     const target = evt.currentTarget;
-    target.style.background = 'rgb(79, 232, 255)';
+    target.classList.add('active');
     const key = parseInt(target.getAttribute('data-keyid'));
 
     console.log(key);
@@ -23,7 +23,7 @@
     evt: PointerEvent & { currentTarget: HTMLDivElement }
   ) => {
     const target = evt.currentTarget;
-    target.style.background = '';
+    target.classList.remove('active');
 
     if (typeof value !== 'string') {
       return;
@@ -38,7 +38,7 @@
 
   connector.get_status().then((it) => {
     items = it.connectedPorts.map(({ port: name }) => ({ name, value: name }));
-    value = items[0];
+    value = (items[0] || { value: undefined }).value;
   });
 </script>
 
@@ -68,6 +68,11 @@
   .keyboard-container {
     position: relative;
     transform-style: preserve-3d;
+
+    :global(.keyboard .key.active) {
+      background: rgb(79, 232, 255);
+    }
+
     &.active-soprano {
       background: none;
 
