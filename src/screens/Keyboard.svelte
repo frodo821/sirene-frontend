@@ -3,6 +3,10 @@
   import { connector } from '../connector';
   import SopranoKeyboard from '../widgets/SopranoKeyboard.svelte';
   import AltoKeyboard from '../widgets/AltoKeyboard.svelte';
+  import { onDestroy } from 'svelte';
+  import App from '../App.svelte';
+
+  type WSEvent = MessageEvent<{ time: number; notes: number[] }>;
 
   const onPointerDown = (
     evt: PointerEvent & { currentTarget: HTMLDivElement }
@@ -40,6 +44,44 @@
     items = it.connectedPorts.map(({ port: name }) => ({ name, value: name }));
     value = (items[0] || { value: undefined }).value;
   });
+
+  const ws = new WebSocket(`ws://${location.host}/ws`);
+
+  ws.onmessage = (message: WSEvent) => {
+    const notes = message.data.notes
+      .map((it, idx) => [it, idx])
+      .filter(([it]) => it !== -1);
+    notes.forEach(([note, index]) => {
+      const key = note.toString().padStart(2, '0');
+      document
+        .querySelectorAll(`.keyboard .key[data-keyid="${key}"]`)
+        .forEach((it) => {
+          it.classList.add('active', `color-${index % 8}`);
+        });
+    });
+
+    const keys = notes
+      .map(([it]) => `[data-keyid="${it.toString().padStart(2, '0')}"]`)
+      .join();
+
+    document.querySelectorAll(`.keyboard .key:not(${keys})`).forEach((it) => {
+      it.classList.remove(
+        'active',
+        'color-0',
+        'color-1',
+        'color-2',
+        'color-3',
+        'color-4',
+        'color-5',
+        'color-6',
+        'color-7'
+      );
+    });
+  };
+
+  onDestroy(() => {
+    ws.close();
+  });
 </script>
 
 <div class="screen">
@@ -70,7 +112,39 @@
     transform-style: preserve-3d;
 
     :global(.keyboard .key.active) {
-      background: rgb(79, 232, 255);
+      background: #4fe8ff;
+    }
+
+    :global(.keyboard .key.active.color-0) {
+      background: #ff7f7f;
+    }
+
+    :global(.keyboard .key.active.color-1) {
+      background: #ff7fbf;
+    }
+
+    :global(.keyboard .key.active.color-2) {
+      background: #ff7fff;
+    }
+
+    :global(.keyboard .key.active.color-3) {
+      background: #bf7fff;
+    }
+
+    :global(.keyboard .key.active.color-4) {
+      background: #7f7fff;
+    }
+
+    :global(.keyboard .key.active.color-5) {
+      background: #7fbfff;
+    }
+
+    :global(.keyboard .key.active.color-6) {
+      background: #4fe8ff;
+    }
+
+    :global(.keyboard .key.active.color-7) {
+      background: #7fff7f;
     }
 
     &.active-soprano {
