@@ -4,15 +4,14 @@
   import SopranoKeyboard from '../widgets/SopranoKeyboard.svelte';
   import AltoKeyboard from '../widgets/AltoKeyboard.svelte';
   import { onDestroy } from 'svelte';
-  import App from '../App.svelte';
 
-  type WSEvent = MessageEvent<{ time: number; notes: number[] }>;
+  type WSEvent = MessageEvent<string>;
 
   const onPointerDown = (
     evt: PointerEvent & { currentTarget: HTMLDivElement }
   ) => {
     const target = evt.currentTarget;
-    target.classList.add('active');
+    target.classList.add('active', 'manual');
     const key = parseInt(target.getAttribute('data-keyid'));
 
     console.log(key);
@@ -27,7 +26,7 @@
     evt: PointerEvent & { currentTarget: HTMLDivElement }
   ) => {
     const target = evt.currentTarget;
-    target.classList.remove('active');
+    target.classList.remove('active', 'manual');
 
     if (typeof value !== 'string') {
       return;
@@ -48,9 +47,10 @@
   const ws = new WebSocket(`ws://${location.host}/ws`);
 
   ws.onmessage = (message: WSEvent) => {
-    const notes = message.data.notes
-      .map((it, idx) => [it, idx])
-      .filter(([it]) => it !== -1);
+    const data: { time: number; notes: number[] } = JSON.parse(message.data);
+    const notes = (data.notes || [])
+      .map((it, idx) => [it+1, idx])
+      .filter(([it]) => it !== 0);
     notes.forEach(([note, index]) => {
       const key = note.toString().padStart(2, '0');
       document
@@ -64,19 +64,25 @@
       .map(([it]) => `[data-keyid="${it.toString().padStart(2, '0')}"]`)
       .join();
 
-    document.querySelectorAll(`.keyboard .key:not(${keys})`).forEach((it) => {
-      it.classList.remove(
-        'active',
-        'color-0',
-        'color-1',
-        'color-2',
-        'color-3',
-        'color-4',
-        'color-5',
-        'color-6',
-        'color-7'
-      );
-    });
+    document
+      .querySelectorAll(
+        keys.length < 1
+          ? '.keyboard .key:not(.manual)'
+          : `.keyboard .key:not(.manual):not(${keys})`
+      )
+      .forEach((it) => {
+        it.classList.remove(
+          'active',
+          'color-0',
+          'color-1',
+          'color-2',
+          'color-3',
+          'color-4',
+          'color-5',
+          'color-6',
+          'color-7'
+        );
+      });
   };
 
   onDestroy(() => {
