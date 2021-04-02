@@ -36,7 +36,6 @@
     connector.get_status().then((it) => {
       status = it;
 
-      console.log(loop_play_checked, status.loop_play);
       if (loop_play_checked !== status.loop_play) {
         setState(
           status.playingMusic ? status.playingMusic.id : undefined,
